@@ -1,0 +1,31 @@
+<section>
+    VmInclude:__COMPONENT__/grid/grid.v3.html
+</section>
+<script>
+    function F__ID(){
+        //-------------------------------------
+        VmInclude:__COMPONENT__/grid/grid.v3.js
+        //-------------------------------------
+        _fields="_Form,Name,Query";
+        _fields+=",Submit Date|DateTime,_Delete";
+        //-------------------------------------
+        $('#D__ID').on('load',function(){  _set_req(); _request_data();  })
+        //-------------------------------------
+        _before_submit=function(record,dbv){
+            //-------------------------------------
+            dbv.S1=record.Name;
+            return true;
+        };
+        //-------------------------------------
+        _set_req=function(){
+            _req={
+                cmd:'query_system_records',db_pid:_db_pid,'I':$('#I__ID').text(),page_size:$('#page_size__ID').val(),
+                s1:$('#keyword__ID').val(),
+            }
+        }
+        //-------------------------------------
+    }
+</script>
+<style>
+    VmInclude:__COMPONENT__/grid/grid.v3.css
+</style>

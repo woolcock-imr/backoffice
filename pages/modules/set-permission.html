@@ -1,0 +1,196 @@
+<section>
+    <div id=toolbar__ID class="navbar navbar-default">
+        <div id=row_1__ID class="form-inline">
+            <button id=save__ID type=button class='btn btn-secondary' title='Save'><i class="fa fa-upload" ></i></button>
+            <input id=keyword__ID type="text" placeholder="keyword" class="form-control" style="width: 150px; display:inline-block;">
+            <input id=group__ID type="text" placeholder="group" class="form-control" style="width: 150px; display:inline-block;">
+            <button style='margin-right:30px' id=query__ID type=button class="btn btn-secondary" title='Search'><i class="fa fa-search" ></i></button>
+            Page Size:
+            <select id=page_size__ID class="form-control" style='margin-right:20px;display:inline-block;width:auto;'><option>30</option><option>50</option><option>100</option><option>200</option></select>
+            <span id=I__ID style="display:none">0</span><span id=A__ID></span>
+            <button id=p__ID type=button class="btn btn-secondary"><i class="fa fa-arrow-left"></i></button>
+            <button id=n__ID type=button class="btn btn-secondary"><i class="fa fa-arrow-right"></i></button>
+            <span class=tab__ID></span><span id=role__ID></span>
+        </div>
+        <span id=elapsed__ID style='float:right'></span>
+    </div>
+    <div id=table__ID>
+        <table id=grid__ID></table>
+    </div>
+</section>
+<script>
+    function F__ID(){
+        //-------------------------------------
+        VmInclude:__COMPONENT__/grid/grid.v3.js
+        //-------------------------------------
+        _fields="ID|UID,Name,Group,Owner,Add,Read,Write,Delete,Lock,Full,Sub_Table";
+        _fields+=",Submit Date|DateTime,Submitted by|Author";
+        //-------------------------------------
+        $('#D__ID').on('load',function(){
+            $('#role__ID').text($vm.vm['__ID'].op.role);
+            _set_req(); _request_data();
+        })
+        //-------------------------------------
+        _cell_render=function(records,I,field,td,set_value,source){
+            switch(field){
+                case 'Owner':
+                case 'Add':
+                case 'Read':
+                case 'Write':
+                case 'Delete':
+                case 'Lock':
+                case 'Full':
+                case 'Sub_Table':
+                    records[I].vm_custom[field]=true;
+                    td.html("<input type=checkbox />")
+                    if(records[I][field]==='1' || records[I][field]==='on' || records[I][field]==='True'){
+                        td.find('input').prop('checked',true);
+                    }
+                    td.find('input').on('click',function(){
+                        if( $(this).prop('checked')===true)  records[I][field]='1';
+                        else                                 records[I][field]='0';
+                        $('#save__ID').css('background','Red');
+                    })
+                    break;
+            }
+        }
+        //---------------------------------------------
+        _set_req=function(){
+            _req={
+                cmd:'query_system_records',db_pid:"30",'I':$('#I__ID').text(),page_size:$('#page_size__ID').val(),
+                s1:'"'+$('#keyword__ID').val()+'"',
+                s2:$("#group__ID").val(),
+            }
+        }
+        //-------------------------------------
+        var set_records=function(field,value){
+            if(value===undefined) return;
+            var pids=value.split(',');
+            for(var i=0;i<pids.length;i++){
+                var pid=pids[i];
+                for(var j=0;j<_records.length;j++){
+                    if(_records[j].UID===pid){
+                         _records[j][field]='1';
+                     }
+                }
+            }
+        }
+        //-------------------------------------
+        _data_process=function (){
+            for(var i=0;i<_records.length;i++){
+                _records[i].Owner='0';
+                _records[i].Add='0';
+                _records[i].Read='0';
+                _records[i].Write='0';
+                _records[i].Delete='0';
+                _records[i].Lock='0';
+                _records[i].Full='0';
+                _records[i].Sub_Table='0';
+            }
+            set_records('Owner',$vm.vm['__ID'].op.Owner);
+            set_records('Add',$vm.vm['__ID'].op.Add);
+            set_records('Read',$vm.vm['__ID'].op.Read);
+            set_records('Write',$vm.vm['__ID'].op.Write);
+            set_records('Delete',$vm.vm['__ID'].op.Delete);
+            set_records('Lock',$vm.vm['__ID'].op.Lock);
+            set_records('Full',$vm.vm['__ID'].op.Full);
+            set_records('Sub_Table',$vm.vm['__ID'].op.Sub_Table);
+        };
+        //-------------------------------------
+        var add_and_remove_pids=function(str_PID,A,B){
+            if(str_PID===undefined) str_PID="";
+            if(str_PID!=="") str_PID=','+str_PID+',';
+            else str_PID=',';
+            var pidsB=B.split(',');
+            for(var i=0;i<pidsB.length;i++){
+                var re=new RegExp(','+pidsB[i]+',', 'g'); str_PID=str_PID.replace(re,',');
+            }
+            var pidsA=A.split(',');
+            for(var i=0;i<pidsA.length;i++){
+                if(str_PID.indexOf(pidsA[i])===-1) str_PID+=pidsA[i]+',';
+            }
+            if(str_PID.length>0){
+                str_PID=str_PID.substring(1);
+                str_PID=str_PID.substring(0, str_PID.length - 1);
+            }
+            return str_PID;
+        }
+        //-------------------------------------
+        $('#save__ID').off('click').on('click',function(){
+            var OwnerA='',OwnerB='';
+            var AddA='',AddB='';
+            var ReadA='',ReadB='';
+            var WriteA='',WriteB='';
+            var DeleteA='',DeleteB='';
+            var LockA='',LockB='';
+            var FullA='',FullB='';
+            var Sub_TableA='',Sub_TableB='';
+            var QueryA='',QueryB='';
+            for(var i=0;i<_records.length;i++){
+                if(_records[i].Owner==="1"){    if(OwnerA!=='') OwnerA+=","; OwnerA+=_records[i].UID;        }
+                else{                           if(OwnerB!=='') OwnerB+=","; OwnerB+=_records[i].UID;        }
+                if(_records[i].Add==="1"){      if(AddA!=='') AddA+=","; AddA+=_records[i].UID;        }
+                else{                           if(AddB!=='') AddB+=","; AddB+=_records[i].UID;        }
+                if(_records[i].Read==="1"){     if(ReadA!=='') ReadA+=","; ReadA+=_records[i].UID;        }
+                else{                           if(ReadB!=='') ReadB+=","; ReadB+=_records[i].UID;        }
+                if(_records[i].Write==="1"){    if(WriteA!=='') WriteA+=","; WriteA+=_records[i].UID;        }
+                else{                           if(WriteB!=='') WriteB+=","; WriteB+=_records[i].UID;        }
+                if(_records[i].Delete==="1"){   if(DeleteA!=='') DeleteA+=","; DeleteA+=_records[i].UID;        }
+                else{                           if(DeleteB!=='') DeleteB+=","; DeleteB+=_records[i].UID;        }
+                if(_records[i].Lock==="1"){     if(LockA!=='') LockA+=","; LockA+=_records[i].UID;        }
+                else{                           if(LockB!=='') LockB+=","; LockB+=_records[i].UID;        }
+                if(_records[i].Full==="1"){     if(FullA!=='') FullA+=","; FullA+=_records[i].UID;        }
+                else{                           if(FullB!=='') FullB+=","; FullB+=_records[i].UID;        }
+                if(_records[i].Sub_Table==="1"){if(Sub_TableA!=='') Sub_TableA+=","; Sub_TableA+=_records[i].UID;        }
+                else{                           if(Sub_TableB!=='') Sub_TableB+=","; Sub_TableB+=_records[i].UID;        }
+            }
+            var new_Owner=add_and_remove_pids($vm.vm['__ID'].op.Owner,OwnerA,OwnerB);
+            var new_Add=add_and_remove_pids($vm.vm['__ID'].op.Add,AddA,AddB);
+            var new_Read=add_and_remove_pids($vm.vm['__ID'].op.Read,ReadA,ReadB);
+            var new_Write=add_and_remove_pids($vm.vm['__ID'].op.Write,WriteA,WriteB);
+            var new_Delete=add_and_remove_pids($vm.vm['__ID'].op.Delete,DeleteA,DeleteB);
+            var new_Lock=add_and_remove_pids($vm.vm['__ID'].op.Lock,LockA,LockB);
+            var new_Full=add_and_remove_pids($vm.vm['__ID'].op.Full,FullA,FullB);
+            var new_Sub_Table=add_and_remove_pids($vm.vm['__ID'].op.Sub_Table,Sub_TableA,Sub_TableB);
+            var row_data={Owner:new_Owner,Add:new_Add,Read:new_Read,Write:new_Write,Delete:new_Delete,Lock:new_Lock,Full:new_Full,Sub_Table:new_Sub_Table};
+            var req={cmd:"modify_system_record",rid:$vm.vm['__ID'].op.rid,db_pid:'26',data:row_data,dbv:{}};
+            $VmAPI.request({data:req,callback:function(res){
+                $('#save__ID').css('background','');
+                $vm.vm['__ID'].op.Owner=new_Owner;
+                $vm.vm['__ID'].op.Add=new_Add;
+                $vm.vm['__ID'].op.Read=new_Read;
+                $vm.vm['__ID'].op.Write=new_Write;
+                $vm.vm['__ID'].op.Delete=new_Delete;
+                $vm.vm['__ID'].op.Lock=new_Lock;
+                $vm.vm['__ID'].op.Full=new_Full;
+                $vm.vm['__ID'].op.Sub_Table=new_Sub_Table;
+            }})
+        })
+        //-------------------------------------
+    }
+</script>
+<style>
+	#toolbar__ID{
+		background-color:#ccc;
+		padding:5px;
+		margin-bottom:0px;
+		overflow:hidden
+	}
+	#toolbar__ID *{
+		margin-right:3px;
+	}
+	@media screen and (max-width:768px){
+		#toolbar__ID{
+			padding: 3px 0;
+		}
+		#toolbar__ID div{
+			padding-left:3px;
+		}
+		#row_1__ID{
+			padding-bottom: 3px;
+		}
+	}
+</style>
+<style>
+    VmInclude:__COMPONENT__/grid/grid.v3.css
+</style>

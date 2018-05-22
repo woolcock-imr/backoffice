@@ -1,0 +1,9 @@
+{
+    "modules":
+	{
+        "database-table":       {"table_id":"30","url":"modules/database-table.html",      "name_for_search":"Database tables"},
+        "system-data-query":    {"table_id":"28","url":"modules/system-data-query.html",   "name_for_search":"System data and query"},
+        "role-permission":      {"table_id":"26","url":"modules/role-permission.html",     "name_for_search":"Roles and permissions"},
+        "set-permission":       {"table_id":"26","url":"modules/set-permission.html",      "name_for_search":""}
+	}
+}
