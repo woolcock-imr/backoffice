@@ -1,0 +1,87 @@
+<div id=D__ID>
+    <section>
+        <div id=toolbar__ID class="navbar navbar-default">
+            <div id=row_1__ID class="form-inline">
+                <button id=new__ID  type=button class='btn btn-secondary' title='New'><i class="fa fa-plus"></i></button>
+                <button id=save__ID type=button class='btn btn-secondary' title='Save'><i class="fa fa-upload" ></i></button>
+                <input id=keyword__ID type="text" placeholder="keyword" class="form-control" style="width: 150px; display:inline-block;">
+                <input id=group__ID type="text" placeholder="group" class="form-control" style="width: 150px; display:inline-block;">
+                <input id=sub_group__ID type="text" placeholder="sub group" class="form-control" style="width: 150px; display:inline-block;">
+                <button style='margin-right:30px' id=query__ID type=button class="btn btn-secondary" title='Search'><i class="fa fa-search" ></i></button>
+
+                Page Size:
+                <select id=page_size__ID class="form-control" style='margin-right:20px;display:inline-block;width:auto;'><option>30</option><option>50</option><option>100</option><option>200</option></select>
+                <span id=I__ID style="display:none">0</span><span id=A__ID></span>
+                <button id=p__ID type=button class="btn btn-secondary"><i class="fa fa-arrow-left"></i></button>
+                <button id=n__ID type=button class="btn btn-secondary"><i class="fa fa-arrow-right"></i></button>
+            </div>
+            <span id=elapsed__ID style='float:right'></span>
+        </div>
+        <div id=table__ID>
+            <table id=grid__ID></table>
+        </div>
+    </section>
+    <script>
+        function F__ID(){
+            //-------------------------------------
+            VmInclude:__COMPONENT__/grid/grid.v3.js
+            _json=0;
+            //-------------------------------------
+            _fields="_Form,ID|UID,Name,Group,Sub_Group,Notes";
+            _fields+=",Submit Date|DateTime,Submitted by|Author,_Delete";
+            //-------------------------------------
+            $('#D__ID').on('load',function(){  _set_req(); _request_data();  })
+            //-------------------------------------
+            _cell_render=function(records,I,field,td,set_value,source){
+                switch(field){
+    				case 'UID':
+                        records[I].vm_readonly[field]=true;
+                        break;
+                }
+            }
+            //-------------------------------------
+            _before_submit=function(record,dbv){
+                dbv.S1=record.Sub_Group;
+                dbv.S2=record.Group;
+                dbv.S3=record.Name;
+                dbv.PUID=$vm.user_id;
+                return true;
+            };
+            //-------------------------------------
+            _set_req=function(){
+                _req={
+                    cmd:'query_system_records',db_pid:_db_pid,'I':$('#I__ID').text(),page_size:$('#page_size__ID').val(),
+                    s1:$('#keyword__ID').val(),
+                    s2:$("#group__ID").val(),
+                    s3:$("#sub_group__ID").val(),
+                }
+            }
+            //-------------------------------------
+        }
+    </script>
+    <style>
+    	#toolbar__ID{
+    		background-color:#ccc;
+    		padding:5px;
+    		margin-bottom:0px;
+    		overflow:hidden
+    	}
+    	#toolbar__ID *{
+    		margin-right:3px;
+    	}
+    	@media screen and (max-width:768px){
+    		#toolbar__ID{
+    			padding: 3px 0;
+    		}
+    		#toolbar__ID div{
+    			padding-left:3px;
+    		}
+    		#row_1__ID{
+    			padding-bottom: 3px;
+    		}
+    	}
+    </style>
+    <style>
+        VmInclude:__COMPONENT__/grid/grid.v3.css
+    </style>
+</div>
